@@ -2,16 +2,13 @@
 # for easier manipulation of the build process, so
 # it's worth adding in.
 
-
 # The name of the resulting ROM file. This will be
 # overwritten by Nix when 'nix build' is called.
 NAME ?= main
 
 ASM=asar
 ASMFLAGS=
-
 VPATH=src
-
 
 .PHONY: all
 all: $(NAME).sfc
