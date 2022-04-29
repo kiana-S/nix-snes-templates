@@ -70,7 +70,7 @@ outputs = { self,
     in {
       packages.emulator = mesen-s;
 
-      shells.default = mkShell {
+      devShells.default = mkShell {
         packages = [ asar mesen-s ];
       };
 
