@@ -34,7 +34,7 @@ outputs = { self,
         nativeBuildInputs = [ cmake ];
         configurePhase = "cmake src";
         installPhase = ''
-          install -Dm555 asar/asar-standalone $out/bin/asar
+          install -Dm755 asar/asar-standalone $out/bin/asar
         '';
       };
       mesen-s = stdenv.mkDerivation {
@@ -56,9 +56,9 @@ outputs = { self,
           mono $out/opt/mesen-s/mesen-s "\$@"
           END
 
-          install -Dm555 mesen-s $out/bin/mesen-s
-          install -Dm555 bin/x64/Release/Mesen-S.exe $out/opt/mesen-s/mesen-s
-          install -Dm444 InteropDLL/obj.x64/libMesenSCore.x64.dll $out/lib/libMesenSCore.dll
+          install -Dm755 mesen-s $out/bin/mesen-s
+          install -Dm755 bin/x64/Release/Mesen-S.exe $out/opt/mesen-s/mesen-s
+          install -Dm644 InteropDLL/obj.x64/libMesenSCore.x64.dll $out/lib/libMesenSCore.dll
         '';
 
         preFixup = ''
@@ -76,13 +76,9 @@ outputs = { self,
 
       packages.default = stdenv.mkDerivation {
         inherit pname version;
-
         src = self;
-
         nativeBuildInputs = [ asar ];
-
-        makeFlags = [ "NAME=${pname}" ];
-        installPhase = "install -m444 ${pname}.sfc $out";
+        installPhase = "install -m644 main.sfc $out";
       };
   });
 }
