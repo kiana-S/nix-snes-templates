@@ -13,90 +13,95 @@ endmacro
 
 org $008000
 Init:
-  sep #$30    ; X,Y,A are 8 bit numbers
-  lda #$8F    ; screen off, full brightness
-  sta $2100   ; brightness + screen enable register 
-  stz $2101   ; Sprite register (size + address in VRAM) 
-  stz $2102   ; Sprite registers (address of sprite memory [OAM])
-  stz $2103   ;    ""                       ""
-  stz $2105   ; Mode 0, = Graphic mode register
-  stz $2106   ; noplanes, no mosaic, = Mosaic register
-  stz $2107   ; Plane 0 map VRAM location
-  stz $2108   ; Plane 1 map VRAM location
-  stz $2109   ; Plane 2 map VRAM location
-  stz $210A   ; Plane 3 map VRAM location
-  stz $210B   ; Plane 0+1 Tile data location
-  stz $210C   ; Plane 2+3 Tile data location
-  stz $210D   ; Plane 0 scroll x (first 8 bits)
-  stz $210D   ; Plane 0 scroll x (last 3 bits) #$0 - #$07ff
-  lda #$FF    ; The top pixel drawn on the screen isn't the top one in the tilemap, it's the one above that.
-  sta $210E   ; Plane 0 scroll y (first 8 bits)
-  sta $2110   ; Plane 1 scroll y (first 8 bits)
-  sta $2112   ; Plane 2 scroll y (first 8 bits)
-  sta $2114   ; Plane 3 scroll y (first 8 bits)
-  lda #$07    ; Since this could get quite annoying, it's better to edit the scrolling registers to fix this.
-  sta $210E   ; Plane 0 scroll y (last 3 bits) #$0 - #$07ff
-  sta $2110   ; Plane 1 scroll y (last 3 bits) #$0 - #$07ff
-  sta $2112   ; Plane 2 scroll y (last 3 bits) #$0 - #$07ff
-  sta $2114   ; Plane 3 scroll y (last 3 bits) #$0 - #$07ff
-  stz $210F   ; Plane 1 scroll x (first 8 bits)
-  stz $210F   ; Plane 1 scroll x (last 3 bits) #$0 - #$07ff
-  stz $2111   ; Plane 2 scroll x (first 8 bits)
-  stz $2111   ; Plane 2 scroll x (last 3 bits) #$0 - #$07ff
-  stz $2113   ; Plane 3 scroll x (first 8 bits)
-  stz $2113   ; Plane 3 scroll x (last 3 bits) #$0 - #$07ff
-  lda #$80    ; increase VRAM address after writing to $2119
-  sta $2115   ; VRAM address increment register
-  stz $2116   ; VRAM address low
-  stz $2117   ; VRAM address high
-  stz $211A   ; Initial Mode 7 setting register
-  stz $211B   ; Mode 7 matrix parameter A register (low)
-  lda #$01
-  sta $211B   ; Mode 7 matrix parameter A register (high)
-  stz $211C   ; Mode 7 matrix parameter B register (low)
-  stz $211C   ; Mode 7 matrix parameter B register (high)
-  stz $211D   ; Mode 7 matrix parameter C register (low)
-  stz $211D   ; Mode 7 matrix parameter C register (high)
-  stz $211E   ; Mode 7 matrix parameter D register (low)
-  sta $211E   ; Mode 7 matrix parameter D register (high)
-  stz $211F   ; Mode 7 center position X register (low)
-  stz $211F   ; Mode 7 center position X register (high)
-  stz $2120   ; Mode 7 center position Y register (low)
-  stz $2120   ; Mode 7 center position Y register (high)
-  stz $2121   ; Color number register ($0-ff)
-  stz $2123   ; BG1 & BG2 Window mask setting register
-  stz $2124   ; BG3 & BG4 Window mask setting register
-  stz $2125   ; OBJ & Color Window mask setting register
-  stz $2126   ; Window 1 left position register
-  stz $2127   ; Window 2 left position register
-  stz $2128   ; Window 3 left position register
-  stz $2129   ; Window 4 left position register
-  stz $212A   ; BG1, BG2, BG3, BG4 Window Logic register
-  stz $212B   ; OBJ, Color Window Logic Register (or,and,xor,xnor)
-  stz $212C   ; Main Screen designation (planes, sprites enable)
-  stz $212D   ; Sub Screen designation
-  stz $212E   ; Window mask for Main Screen
-  stz $212F   ; Window mask for Sub Screen
-  lda #$30
-  sta $2130   ; Color addition & screen addition init setting
-  stz $2131   ; Add/Sub sub designation for screen, sprite, color
-  lda #$E0
-  sta $2132   ; color data for addition/subtraction
-  stz $2133   ; Screen setting (interlace x,y/enable SFX data)
-  stz $4200   ; Enable V-blank, interrupt, Joypad register
+  ;; Set defaults for registers
+
+  sep #$30      ; X,Y,A are 8 bit numbers
+  lda #$8F
+  sta INIDISP   ; screen off, full brightness
+  stz OBJSEL    ; Objects are 8x8 or 16x16,
+                ; use first 2 pages of VRAM
+  stz OAMADDL   ; OAM address $0000
+  stz OAMADDH
+  stz BGMODE    ; Background mode 0
+  stz MOSAIC
+  stz BG1SC     ; All backgrounds use tilemap $0000,
+  stz BG2SC     ; 1 page in size (32x32)
+  stz BG3SC
+  stz BG4SC
+  stz BG12NBA   ; All backgrounds use character data $0000
+  stz BG34NBA
   lda #$FF
-  sta $4201   ; Programmable I/O port
-  stz $4202   ; Multiplicand A
-  stz $4203   ; Multiplier B
-  stz $4204   ; Multiplier C
-  stz $4205   ; Multiplicand C
-  stz $4206   ; Divisor B
-  stz $4207   ; Horizontal Count Timer
-  stz $4208   ; Horizontal Count Timer MSB (most significant bit)
-  stz $4209   ; Vertical Count Timer
-  stz $420A   ; Vertical Count Timer MSB
-  stz $420B   ; General DMA enable (bits 0-7)
-  stz $420C   ; Horizontal DMA (HDMA) enable (bits 0-7)
-  stz $420D   ; Access cycle designation (slow/fast rom)
-  cli         ; Enable interrupts
+  sta BG1VOFS   ; Vertical scroll position $07FF
+  sta BG2VOFS
+  sta BG3VOFS
+  sta BG4VOFS
+  lda #$07
+  sta BG1VOFS
+  sta BG2VOFS
+  sta BG3VOFS
+  sta BG4VOFS
+  stz BG1HOFS   ; Horizontal scroll position $0000
+  stz BG1HOFS
+  stz BG2HOFS
+  stz BG2HOFS
+  stz BG3HOFS
+  stz BG3HOFS
+  stz BG4HOFS
+  stz BG4HOFS
+  lda #$80
+  sta VMAINC    ; Increment after high byte by 1, no remapping
+  stz VMADDL    ; VRAM address $0000
+  stz VMADDH
+  stz M7SEL
+  lda #$01
+  stz M7A       ; Default to identity matrix
+  sta M7A       ; [$0001  $0000]
+  stz M7B       ; [$0000  $0001]
+  stz M7B
+  stz M7C
+  stz M7C
+  stz M7D
+  sta M7D
+  stz M7X
+  stz M7X
+  stz M7Y
+  stz M7Y
+  stz CGADD     ; CGRAM address $00
+  stz W12SEL    ; Disable all layers
+  stz W34SEL
+  stz WOBJSEL
+  stz WH0       ; Disable all windows
+  stz WH1
+  stz WH2
+  stz WH3
+  stz WBGLOG    ; Intersection mode OR
+  stz WOBJLOG
+  stz TM        ; Disable all layers on main screen
+  stz TS        ; Disable all layers on sub screen
+  stz TMW
+  stz TSW
+  lda #$30
+  sta CGSWSEL   ; Enable main screen, disable sub screen
+  stz CGADSUB   ; Disable color math
+  lda #$E0
+  sta COLDATA   ; Fixed subscreen color black
+  stz INISET    ; Disable interlacing, overscan,
+                ; pseudo-512 mode
+  stz NMITIMEN  ; Disable NMIs (V-blank), IRQ timers,
+                ; and auto-joypad-read
+  lda #$FF
+  sta WRIO      ; Pull all I/O ports low
+  stz WRMPYA
+  stz WRMPYB
+  stz WRDIVL
+  stz WRDIVH
+  stz WRDIVB
+  stz HTIMEL
+  stz HTIMEH
+  stz VTIMEL
+  stz VTIMEH
+  stz MDMAEN    ; Disable all DMA & HDMA
+  stz HDMAEN
+  stz MEMSEL    ; SlowROM default
+  cli
   rts
